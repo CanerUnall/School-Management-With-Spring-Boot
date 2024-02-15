@@ -52,7 +52,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<!-- eger sorun olursa buraya ilgili kodu ekle-->
 				<configuration>
 					<excludes>
 						<exclude>
