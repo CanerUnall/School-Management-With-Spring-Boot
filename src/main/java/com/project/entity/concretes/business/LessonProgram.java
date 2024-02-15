@@ -51,5 +51,4 @@ public class LessonProgram {
     private void removeLessonProgramFromUser(){
         users.forEach(user -> user.getLessonsProgramList().remove(this));
     }
-
 }

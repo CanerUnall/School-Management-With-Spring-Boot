@@ -1,6 +1,5 @@
 package com.project.contactmessage.repository;
 
-import com.project.contactmessage.dto.ContactMessageResponse;
 import com.project.contactmessage.entity.ContactMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.DoubleStream;
 
 @Repository
 public interface ContactMessageRepository extends JpaRepository<ContactMessage, Long> {
@@ -19,31 +18,26 @@ public interface ContactMessageRepository extends JpaRepository<ContactMessage, 
 
     Page<ContactMessage> findBySubjectEquals(String subject, Pageable pageable);
 
-    //JPQL
     @Query("SELECT c FROM ContactMessage c WHERE FUNCTION('DATE', c.dateTime) BETWEEN ?1 AND ?2")
     List<ContactMessage> findMessagesBetweenDates(LocalDate beginDate, LocalDate endDate);
-                int y = 7;
-                //int x = startHour;
-                //@Param("x") int startHour
-    //JPQL
+
     @Query("SELECT c FROM ContactMessage c WHERE " +
             "(EXTRACT(HOUR FROM c.dateTime) BETWEEN :startHour AND :endHour) AND " +
             "(EXTRACT(HOUR FROM c.dateTime) != :startHour OR EXTRACT(MINUTE FROM c.dateTime) >= :startMinute) AND " + // baslama dakikasina gore kontrol
-            "(EXTRACT(HOUR FROM c.dateTime) != :endHour OR EXTRACT(MINUTE FROM c.dateTime) <= :endMinute)")
-    // bitis dakikasina gore kontrol
+            "(EXTRACT(HOUR FROM c.dateTime) != :endHour OR EXTRACT(MINUTE FROM c.dateTime) <= :endMinute)") // bitis dakikasina gore kontrol
     List<ContactMessage> findMessagesBetweenTimes(@Param("startHour") int startHour,
                                                   @Param("startMinute") int startMinute,
                                                   @Param("endHour") int endHour,
                                                   @Param("endMinute") int endMinute);
 
+    	/*
+		Yukardaki Query icin ornek senaryo :
+		Db deki ContactMessage  ssati 09:30
+		Sorguda gelen parametreler --> 09:15 / 17:15
+		Ilk AND --> TRUE
+		ikinci AND --> False OR True
+		ucuncu AND --> True OR False
+	 */ // Query aciklama
 
-        /*
-        Yukardaki Query icin ornek senaryo :
-        Db deki ContactMessage  ssati 09:30 -- 10:20 -- 21:10 --11:03--17:25--09:03
-        Sorguda gelen parametreler --> 09:15 / 17:15
 
-        Ilk AND --> TRUE
-        ikinci AND --> False OR True
-        ucuncu AND --> True OR False
-        */ // Query aciklama
 }

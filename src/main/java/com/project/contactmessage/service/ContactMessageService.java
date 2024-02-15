@@ -69,8 +69,7 @@ public class ContactMessageService {
     }
 
     public ContactMessage getContactMessageById(Long id){
-        return contactMessageRepository.findById(id).
-                orElseThrow(()->
+        return contactMessageRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(Messages.NOT_FOUND_MESSAGE));
     }
 

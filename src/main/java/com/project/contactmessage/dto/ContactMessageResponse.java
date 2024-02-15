@@ -18,7 +18,7 @@ public class ContactMessageResponse {
     private String name;
     private String email;
     private String subject;
-    private String message;
+    private String message ;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime dateTime;
