@@ -21,13 +21,13 @@ public class JwtUtils {
     @Value("${backendapi.app.jwtSecret}")
     private String jwtSecret;
 
-    public String generateJwtToken(Authentication authentication) {
+    public String generateJwtToken(Authentication authentication){
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         return generateTokenFromUsername(userDetails.getUsername());
     }
 
-    public String generateTokenFromUsername(String username) {
+    public String generateTokenFromUsername(String username){
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
@@ -36,13 +36,13 @@ public class JwtUtils {
                 .compact();
     }
 
-    public boolean validateJwtToken(String jwtToken) {
+    public boolean validateJwtToken(String jwtToken){
 
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwtToken);
             return true;
         } catch (ExpiredJwtException e) {
-            LOGGER.error("Jwt token is expired : {}", e.getMessage());
+           LOGGER.error("Jwt token is expired : {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
             LOGGER.error("Jwt token is unsupported : {}", e.getMessage());
         } catch (MalformedJwtException e) {
@@ -55,7 +55,7 @@ public class JwtUtils {
         return false;
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public String getUserNameFromJwtToken(String token){
         return Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
