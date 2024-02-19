@@ -1,6 +1,5 @@
 package com.project.service;
 
-import com.project.entity.concretes.user.User;
 import com.project.payload.request.authentication.LoginRequest;
 import com.project.payload.response.authentication.AuthResponse;
 import com.project.repository.user.UserRepository;
@@ -38,11 +37,6 @@ public class AuthenticationService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         // !!! JWT token olusturuluyor
         String token = "Bearer " + jwtUtils.generateJwtToken(authentication);
-
-        //ilk yol direkt repodan cagirabilirsin
-        User user = userRepository.findByUsernameEquals(username);
-
-        //bu ikinci yol
         // !!! login islemini gerceklestirilen kullaniciya ulasiliyor
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         // !!!  Response olarak login islemini yapan kullaniciyi donecegiz gerekli fieldlar setleniyor

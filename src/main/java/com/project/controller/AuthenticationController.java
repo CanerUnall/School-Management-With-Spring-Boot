@@ -1,14 +1,15 @@
 package com.project.controller;
 
-import com.project.entity.concretes.user.User;
 import com.project.payload.request.authentication.LoginRequest;
 import com.project.payload.response.authentication.AuthResponse;
 import com.project.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -23,7 +24,7 @@ public class AuthenticationController {
         return authenticationService.authenticateUser(loginRequest);
     }
 
-    /* @GetMapping("/user") // http://localhost:8080/auth/user + GET
+/*    @GetMapping("/user") // http://localhost:8080/auth/user + GET
     public ResponseEntity<?> findByUsername(HttpServletRequest request){
 
     }*/
