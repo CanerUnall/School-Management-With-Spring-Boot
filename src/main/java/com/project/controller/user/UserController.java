@@ -2,6 +2,7 @@ package com.project.controller.user;
 
 import com.project.payload.messages.ErrorMessages;
 import com.project.payload.request.user.UserRequest;
+import com.project.payload.request.user.UserRequestWithoutPassword;
 import com.project.payload.response.abstracts.BaseUserResponse;
 import com.project.payload.response.business.ResponseMessage;
 import com.project.payload.response.user.UserResponse;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -48,5 +50,33 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")
     public ResponseMessage<BaseUserResponse> getUserById(@PathVariable Long userId) {
         return userService.getUserById(userId);
+    }
+    // !!!  deleteUser()
+    // !!! Admin ise hepsini silebilsin
+    // !!! Mudur ve Mudur Yrd ise altindaki rol yetkisi olani silebilsin
+    @DeleteMapping("/delete/{id}") // http://localhost:8080/user/delete/3
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id, HttpServletRequest httpServletRequest){
+
+        return ResponseEntity.ok(userService.deleteUserById(id, httpServletRequest));
+    }
+
+    // Update
+    // !!! Admin --> Dean veya  ViceDEan i guncellerken kullanilacak method
+    // !!! Student ve teacher icin ekstra fieldlar gerekecegi icin, baska endpoint gerekiyor
+    @PutMapping("/update/{userId}")  // http://localhost:8080/user/update/1 + PUT + JSON
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseMessage<BaseUserResponse> updateAdminDeanViceDeanForAdmin( @RequestBody @Valid UserRequest userRequest,
+                                                                              @PathVariable Long userId){
+        return userService.updateUser(userRequest,userId);
+    }
+
+    // Update
+    // !!! Kullanicinin kendisini update etmesini saglayan method
+    @PatchMapping("/updateUser") // http://localhost:8080/user/updateUser + PATCH + JSON
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER')")
+    public ResponseEntity<String> updateUser(@RequestBody @Valid UserRequestWithoutPassword userRequestWithoutPassword,
+                                             HttpServletRequest request){
+        return userService.updateUserForUsers(userRequestWithoutPassword, request);
     }
 }

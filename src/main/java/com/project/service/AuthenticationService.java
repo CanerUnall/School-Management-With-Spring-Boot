@@ -49,6 +49,8 @@ public class AuthenticationService {
         // !!! JWT token olusturuluyor
         String token = "Bearer " + jwtUtils.generateJwtToken(authentication);
         // !!! login islemini gerceklestirilen kullaniciya ulasiliyor
+
+
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         // !!!  Response olarak login islemini yapan kullaniciyi donecegiz gerekli fieldlar setleniyor
 
