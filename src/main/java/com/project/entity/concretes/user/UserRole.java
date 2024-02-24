@@ -1,6 +1,6 @@
 package com.project.entity.concretes.user;
 
-import com.project.entity.enums.RoleType2;
+import com.project.entity.enums.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class UserRole {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private RoleType2 roleType;
+    private RoleType roleType;
 
     private String roleName;
 }

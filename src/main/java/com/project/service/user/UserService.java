@@ -1,7 +1,7 @@
 package com.project.service.user;
 
 import com.project.entity.concretes.user.User;
-import com.project.entity.enums.RoleType2;
+import com.project.entity.enums.RoleType;
 import com.project.exception.BadRequestException;
 import com.project.exception.ResourceNotFoundException;
 import com.project.payload.mappers.UserMapper;
@@ -25,7 +25,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,17 +49,17 @@ public class UserService {
         //!!! DTO --> POJO
         User user = userMapper.mapUserRequestToUser(userRequest);
         //!!! Rol bilgisini setliyoruz
-        if (userRole.equalsIgnoreCase(RoleType2.ADMIN.name())) {
+        if (userRole.equalsIgnoreCase(RoleType.ADMIN.name())) {
 
             if (Objects.equals(userRequest.getUsername(), "Admin")) {
                 user.setBuilt_in(true);
             }
             //!!! admin rolu veriliyor
-            user.setUserRole(userRoleService.getUserRole(RoleType2.ADMIN));
+            user.setUserRole(userRoleService.getUserRole(RoleType.ADMIN));
         } else if (userRole.equalsIgnoreCase("Dean")) {
-            user.setUserRole(userRoleService.getUserRole(RoleType2.MANAGER));
+            user.setUserRole(userRoleService.getUserRole(RoleType.MANAGER));
         } else if (userRole.equalsIgnoreCase("ViceDean")) {
-            user.setUserRole(userRoleService.getUserRole(RoleType2.ASSISTANT_MANAGER));
+            user.setUserRole(userRoleService.getUserRole(RoleType.ASSISTANT_MANAGER));
         } else {
             throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_USERROLE_MESSAGE, userRole));
         }
@@ -87,9 +89,9 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE, userId)));
 
-        if (user.getUserRole().getRoleType() == RoleType2.STUDENT) {
+        if (user.getUserRole().getRoleType() == RoleType.STUDENT) {
             baseUserResponse = userMapper.mapUserToStudentResponse(user);
-        } else if (user.getUserRole().getRoleType() == RoleType2.TEACHER) {
+        } else if (user.getUserRole().getRoleType() == RoleType.TEACHER) {
             baseUserResponse = userMapper.mapUserToTeacherResponse(user);
         } else {
             baseUserResponse = userMapper.mapUserToUserResponse(user);
@@ -115,16 +117,16 @@ public class UserService {
         if (Boolean.TRUE.equals(user.getBuilt_in())) {
             throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
             // MANAGER sadece Teacher, student, Assistant_Manager silebilir
-        } else if (user2.getUserRole().getRoleType() == RoleType2.MANAGER) {
-            if (!((user.getUserRole().getRoleType() == RoleType2.TEACHER) ||
-                    (user.getUserRole().getRoleType() == RoleType2.STUDENT) ||
-                    (user.getUserRole().getRoleType() == RoleType2.ASSISTANT_MANAGER))) {
+        } else if (user2.getUserRole().getRoleType() == RoleType.MANAGER) {
+            if (!((user.getUserRole().getRoleType() == RoleType.TEACHER) ||
+                    (user.getUserRole().getRoleType() == RoleType.STUDENT) ||
+                    (user.getUserRole().getRoleType() == RoleType.ASSISTANT_MANAGER))) {
                 throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
             }
             // Mudur Yardimcisi sadece Teacher veya Student silebilir
-        } else if (user2.getUserRole().getRoleType() == RoleType2.ASSISTANT_MANAGER) {
-            if (!((user.getUserRole().getRoleType() == RoleType2.TEACHER) ||
-                    (user.getUserRole().getRoleType() == RoleType2.STUDENT))) {
+        } else if (user2.getUserRole().getRoleType() == RoleType.ASSISTANT_MANAGER) {
+            if (!((user.getUserRole().getRoleType() == RoleType.TEACHER) ||
+                    (user.getUserRole().getRoleType() == RoleType.STUDENT))) {
                 throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
             }
         }
@@ -187,5 +189,19 @@ public class UserService {
 
         String message = SuccessMessages.USER_UPDATE;
         return ResponseEntity.ok(message);
+    }
+
+    public List<UserResponse> getUserByName(String name) {
+
+        return userRepository.getUserByNameContaining(name) // List<User>
+                .stream() // stream<User>
+                .map(userMapper::mapUserToUserResponse) // stream<UserResponse>
+                .collect(Collectors.toList()); // List<UserResponse>
+    }
+
+
+    //!!! Runner tarafi icin yazildi
+    public long countAllAdmins(){
+        return userRepository.countAdmin(RoleType.ADMIN);
     }
 }

@@ -1,25 +1,21 @@
 package com.project.entity.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum RoleType {
 
-    STUDENT("Student",1),
-    TEACHER("Teacher",2),
-    ASSISTANT_MANAGER("ViceDean",3),
-    MANAGER("Dean",4),
-    ADMIN("Admin",5);
+    STUDENT("Student"),
+    TEACHER("Teacher"),
+    ASSISTANT_MANAGER("ViceDean"),
+    MANAGER("Dean"),
+    ADMIN("Admin");
     public final String name;
-    public final int rank;
 
-    RoleType(String name, int rank) {
+
+    RoleType(String name) {
         this.name = name;
-        this.rank = rank;
+
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getRank() {
-        return rank;
-    }
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -79,4 +80,13 @@ public class UserController {
                                              HttpServletRequest request){
         return userService.updateUserForUsers(userRequestWithoutPassword, request);
     }
+
+    //!!! getByName
+    @GetMapping("/getUserByName") // http://localhost:8080/user/getUserByName?name=user1  + GET
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public List<UserResponse> getUserByName(@RequestParam (name = "name") String userName){
+        return userService.getUserByName(userName);
+    }
+
+
 }
