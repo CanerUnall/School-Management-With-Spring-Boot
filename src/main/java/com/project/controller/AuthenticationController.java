@@ -5,6 +5,7 @@ import com.project.payload.request.authentication.LoginRequest;
 import com.project.payload.request.business.UpdatePasswordRequest;
 import com.project.payload.response.abstracts.BaseUserResponse;
 import com.project.payload.response.authentication.AuthResponse;
+import com.project.payload.response.business.ResponseMessage;
 import com.project.payload.response.user.UserResponse;
 import com.project.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,13 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/login") // http://localhost:8080/auth/login  + POST
+    /*@PostMapping("/login") // http://localhost:8080/auth/login  + POST
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
+        return authenticationService.authenticateUser(loginRequest);
+    }*/
+
+    @PostMapping("/login") // http://localhost:8080/auth/login  + POST
+    public ResponseMessage<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
         return authenticationService.authenticateUser(loginRequest);
     }
 
