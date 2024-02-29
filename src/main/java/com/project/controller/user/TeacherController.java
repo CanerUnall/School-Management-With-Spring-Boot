@@ -22,7 +22,7 @@ public class TeacherController {
 
     private final TeacherService teacherService;
 
-    @PostMapping("save")
+    @PostMapping("/save")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<ResponseMessage<TeacherResponse>> saveTeacher(@RequestBody @Valid TeacherRequest teacherRequest) {
         return ResponseEntity.ok(teacherService.saveTeacher(teacherRequest));
