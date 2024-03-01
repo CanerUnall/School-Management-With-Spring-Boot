@@ -11,8 +11,11 @@ import com.project.payload.request.business.LessonProgramRequest;
 import com.project.payload.response.business.LessonProgramResponse;
 import com.project.payload.response.business.ResponseMessage;
 import com.project.repository.business.LessonProgramRepository;
+import com.project.service.helper.PageableHelper;
 import com.project.service.validator.DateTimeValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +33,7 @@ public class LessonProgramService {
     private final EducationTermService educationTermService;
     private final DateTimeValidator dateTimeValidator;
     private final LessonProgramMapper lessonProgramMapper;
+    private final PageableHelper pageableHelper;
 
     public ResponseMessage<LessonProgramResponse> saveLessonProgram(LessonProgramRequest lessonProgramRequest) {
         //!!! LessonProgramda olacak dersleri LessonService den getiriyorum
@@ -38,17 +42,17 @@ public class LessonProgramService {
         EducationTerm educationTerm =
                 educationTermService.findEducationTermById(lessonProgramRequest.getEducationTermId());
         //!!! yukarda gelen lessons ici bos olma kontrolu :
-        if(lessons.isEmpty()){
-            throw  new ResourceNotFoundException(ErrorMessages.NOT_FOUND_LESSON_IN_LIST);
+        if (lessons.isEmpty()) {
+            throw new ResourceNotFoundException(ErrorMessages.NOT_FOUND_LESSON_IN_LIST);
         }
         //!!! zaman kontrolu
         dateTimeValidator.checkTimeWithException(lessonProgramRequest.getStartTime(),
-                                                 lessonProgramRequest.getStopTime());
+                lessonProgramRequest.getStopTime());
         //!!! DTO--> POJO
         LessonProgram lessonProgram =
-                lessonProgramMapper.mapLessonProgramRequestToLessonProgram(lessonProgramRequest,lessons,educationTerm);
+                lessonProgramMapper.mapLessonProgramRequestToLessonProgram(lessonProgramRequest, lessons, educationTerm);
 
-        LessonProgram savedLessonProgram =  lessonProgramRepository.save(lessonProgram);
+        LessonProgram savedLessonProgram = lessonProgramRepository.save(lessonProgram);
         return ResponseMessage.<LessonProgramResponse>builder()
                 .message(SuccessMessages.LESSON_PROGRAM_SAVED)
                 .httpStatus(HttpStatus.CREATED)
@@ -68,8 +72,8 @@ public class LessonProgramService {
         return lessonProgramMapper.mapLessonProgramToLessonProgramResponse(isLessonProgramExistById(id));
     }
 
-    private LessonProgram isLessonProgramExistById(Long id){
-        return lessonProgramRepository.findById(id).orElseThrow(()->
+    private LessonProgram isLessonProgramExistById(Long id) {
+        return lessonProgramRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE, id)));
     }
 
@@ -94,5 +98,26 @@ public class LessonProgramService {
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toSet());
+    }
+
+    public ResponseMessage<String> deleteById(Long id) {
+
+        isLessonProgramExistById(id);
+
+        lessonProgramRepository.deleteById(id);
+
+        return ResponseMessage.<String>builder()
+                .message(String.format(SuccessMessages.LESSON_PROGRAM_DELETED,id))
+                .httpStatus(HttpStatus.OK).build();
+
+    }
+
+    public Page<LessonProgramResponse> getLessonProgramsByPage(int page, int size, String sort, String type) {
+
+        Pageable pageable = pageableHelper.getPageableWithProperties(page,size,sort,type);
+
+        Page<LessonProgram> lessonPrograms=lessonProgramRepository.findAll(pageable);
+
+        return lessonPrograms.map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse);
     }
 }
