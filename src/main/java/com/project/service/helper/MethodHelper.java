@@ -27,6 +27,7 @@ public class MethodHelper {
             throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
         }
     }
+
     //!!! Rol kontrolu yapan metod
     public void checkRole(User user, RoleType roleType){
         if(!user.getUserRole().getRoleType().equals(roleType)){
@@ -52,5 +53,4 @@ public class MethodHelper {
             throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_ADVISOR_MESSAGE, user.getId()));
         }
     }
-
 }

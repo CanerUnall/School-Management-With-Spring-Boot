@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -45,13 +44,13 @@ public class LessonService {
 
     private boolean isLessonExistByLessonName(String lessonName){ // JAVA , java, Java
 
-        boolean lessonExist = lessonRepository.existsLessonByLessonNameEqualsIgnoreCase(lessonName);
+       boolean lessonExist = lessonRepository.existsLessonByLessonNameEqualsIgnoreCase(lessonName);
 
-        if(lessonExist) {
-            throw new ConflictException(String.format(ErrorMessages.LESSON_ALREADY_EXIST_WITH_LESSON_NAME, lessonName));
-        } else {
-            return false;
-        }
+       if(lessonExist) {
+           throw new ConflictException(String.format(ErrorMessages.LESSON_ALREADY_EXIST_WITH_LESSON_NAME, lessonName));
+       } else {
+           return false;
+       }
     }
 
     public ResponseMessage deleteLessonById(Long id) {
@@ -72,14 +71,14 @@ public class LessonService {
     }
 
     public ResponseMessage<LessonResponse> getLessonByLessonName(String lessonName) {
-        //Lesson lesson = lessonRepository.getLessonByLessonName(lessonName).orElseThrow();
+
         if (lessonRepository.getLessonByLessonName(lessonName).isPresent()){
             return ResponseMessage.<LessonResponse>builder()
                     .message(SuccessMessages.LESSON_FOUND)
-                    .object(lessonMapper.mapLessonToLessonResponse(lessonRepository.getLessonByLessonName(lessonName).get()))
+                    .object(lessonMapper.mapLessonToLessonResponse(
+                            lessonRepository.getLessonByLessonName(lessonName).get()))
                     .build();
         } else {
-            //throw new ConflictException("asdasd");
             return ResponseMessage.<LessonResponse>builder()
                     .message(String.format(ErrorMessages.NOT_FOUND_LESSON_MESSAGE, lessonName))
                     .build();
@@ -104,9 +103,8 @@ public class LessonService {
 
         // !!! requeste ders ismi degisti ise unique olmasi gerekiyor kontrolu
         if(
-                !(lesson.getLessonName().equals(lessonRequest.getLessonName())) &&
-                        // requestten gelen ders ismi DB deki ders isminden farkli ise
-                        (lessonRepository.existsByLessonName(lessonRequest.getLessonName()))
+                !(lesson.getLessonName().equals(lessonRequest.getLessonName())) && // requestten gelen ders ismi DB deki ders isminden farkli ise
+                (lessonRepository.existsByLessonName(lessonRequest.getLessonName()))
         ){
             throw new ConflictException(
                     String.format(ErrorMessages.LESSON_ALREADY_EXIST_WITH_LESSON_NAME, lessonRequest.getLessonName()));
@@ -115,20 +113,10 @@ public class LessonService {
         //!!! DTO --> POJO
         Lesson updatedLesson = lessonMapper.mapLessonRequestToUpdatedLesson(lessonId, lessonRequest);
         //!!! Dto-POJO donusumunde setlenmeyen LessonProgram verileri setleniyor, bunu yapmazsak DB deki bu deger
-        // NULL olarak atanir
+         // NULL olarak atanir
         updatedLesson.setLessonPrograms(lesson.getLessonPrograms());
-
         Lesson savedLesson = lessonRepository.save(updatedLesson);
 
         return lessonMapper.mapLessonToLessonResponse(savedLesson);
     }
-
-    /*public ResponseEntity<ResponseMessage<Page<LessonResponse>>> findLessonByPage(int page, int size, String sort, String type) {
-        Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
-        Page<LessonResponse> pageSs = lessonRepository.findAll(pageable).map(lessonMapper::mapLessonToLessonResponse);
-        ResponseMessage<Page<LessonResponse>> responsemessage123 =
-                ResponseMessage.<Page<LessonResponse>>builder().object(pageSs).message("asdas")
-                .httpStatus(HttpStatus.CREATED).build();
-        return new ResponseEntity<>(responsemessage123,HttpStatus.OK);
-    }*/
 }

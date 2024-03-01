@@ -11,6 +11,7 @@ import com.project.payload.request.user.UserRequest;
 import com.project.payload.request.user.UserRequestWithoutPassword;
 import com.project.payload.response.abstracts.BaseUserResponse;
 import com.project.payload.response.business.ResponseMessage;
+import com.project.payload.response.user.TeacherResponse;
 import com.project.payload.response.user.UserResponse;
 import com.project.repository.user.UserRepository;
 import com.project.service.helper.MethodHelper;
@@ -45,13 +46,13 @@ public class UserService {
 
         //!!! Girilen username, email, phoneNumber, ssn
         uniquePropertyValidator.checkDuplicate(userRequest.getUsername(), userRequest.getSsn(),
-                userRequest.getPhoneNumber(), userRequest.getEmail());
+                userRequest.getPhoneNumber(),userRequest.getEmail());
         //!!! DTO --> POJO
         User user = userMapper.mapUserRequestToUser(userRequest);
         //!!! Rol bilgisini setliyoruz
-        if (userRole.equalsIgnoreCase(RoleType.ADMIN.name())) {
+        if(userRole.equalsIgnoreCase(RoleType.ADMIN.name())){
 
-            if (Objects.equals(userRequest.getUsername(), "Admin")) {
+            if(Objects.equals(userRequest.getUsername(),"Admin")){
                 user.setBuilt_in(true);
             }
             //!!! admin rolu veriliyor
@@ -76,7 +77,7 @@ public class UserService {
     }
 
     public Page<UserResponse> getUsersByPage(int page, int size, String sort, String type, String userRole) {
-        Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+        Pageable pageable=  pageableHelper.getPageableWithProperties(page, size, sort, type);
 
         return userRepository.findByUserByRole(userRole, pageable)
                 .map(userMapper::mapUserToUserResponse);
@@ -86,10 +87,10 @@ public class UserService {
 
         BaseUserResponse baseUserResponse = null;
 
-        User user = userRepository.findById(userId).orElseThrow(() ->
+        User user = userRepository.findById(userId).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE, userId)));
 
-        if (user.getUserRole().getRoleType() == RoleType.STUDENT) {
+        if(user.getUserRole().getRoleType() == RoleType.STUDENT){
             baseUserResponse = userMapper.mapUserToStudentResponse(user);
         } else if (user.getUserRole().getRoleType() == RoleType.TEACHER) {
             baseUserResponse = userMapper.mapUserToTeacherResponse(user);
@@ -102,8 +103,6 @@ public class UserService {
                 .httpStatus(HttpStatus.OK)
                 .object(baseUserResponse)
                 .build();
-
-
     }
 
     public String deleteUserById(Long id, HttpServletRequest request) {
@@ -114,33 +113,24 @@ public class UserService {
         String userName = (String) request.getAttribute("username");
         User user2 = userRepository.findByUsernameEquals(userName);
         //!!! builtIn ve Role kontrolu
-        if (Boolean.TRUE.equals(user.getBuilt_in())) {
-            throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
+        if(Boolean.TRUE.equals(user.getBuilt_in())){
+            throw  new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
             // MANAGER sadece Teacher, student, Assistant_Manager silebilir
         } else if (user2.getUserRole().getRoleType() == RoleType.MANAGER) {
-            if (!((user.getUserRole().getRoleType() == RoleType.TEACHER) ||
-                    (user.getUserRole().getRoleType() == RoleType.STUDENT) ||
-                    (user.getUserRole().getRoleType() == RoleType.ASSISTANT_MANAGER))) {
+            if(!( (user.getUserRole().getRoleType() == RoleType.TEACHER) ||
+                   (user.getUserRole().getRoleType() == RoleType.STUDENT) ||
+                   (user.getUserRole().getRoleType() == RoleType.ASSISTANT_MANAGER)) ){
                 throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
             }
             // Mudur Yardimcisi sadece Teacher veya Student silebilir
         } else if (user2.getUserRole().getRoleType() == RoleType.ASSISTANT_MANAGER) {
-            if (!((user.getUserRole().getRoleType() == RoleType.TEACHER) ||
-                    (user.getUserRole().getRoleType() == RoleType.STUDENT))) {
-                throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
-            }
+           if(!( (user.getUserRole().getRoleType() == RoleType.TEACHER) ||
+                  (user.getUserRole().getRoleType() == RoleType.STUDENT) )){
+               throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
+           }
         }
-
-        /*if(Boolean.TRUE.equals(user.getBuilt_in())){
-            throw  new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
-        } else if(!(user2.getUserRole().getRoleType().rank>2&&user2.getUserRole().getRoleType().rank>user.getUserRole().getRoleType().rank)){
-            //kullanici seviye olarak sadece kendi altindakileri silebilir.
-            throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
-        }*/
-
         userRepository.deleteById(id);
         return SuccessMessages.USER_DELETE;
-
     }
 
     public ResponseMessage<BaseUserResponse> updateUser(UserRequest userRequest, Long userId) {
@@ -185,10 +175,10 @@ public class UserService {
         user.setSurname(userRequest.getSurname());
         user.setSsn(userRequest.getSsn());
 
-        userRepository.save(user);
+       userRepository.save(user);
 
-        String message = SuccessMessages.USER_UPDATE;
-        return ResponseEntity.ok(message);
+       String message = SuccessMessages.USER_UPDATE;
+       return ResponseEntity.ok(message);
     }
 
     public List<UserResponse> getUserByName(String name) {
@@ -198,7 +188,6 @@ public class UserService {
                 .map(userMapper::mapUserToUserResponse) // stream<UserResponse>
                 .collect(Collectors.toList()); // List<UserResponse>
     }
-
 
     //!!! Runner tarafi icin yazildi
     public long countAllAdmins(){

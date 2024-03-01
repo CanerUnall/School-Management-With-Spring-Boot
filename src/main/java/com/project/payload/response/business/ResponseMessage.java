@@ -13,9 +13,9 @@ import org.springframework.http.HttpStatus;
 @Builder(toBuilder = true)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseMessage<U> {
+public class ResponseMessage<E> {
 
-    private U object;
+    private E object;
     private String message;
     private HttpStatus httpStatus;
 }

@@ -23,7 +23,7 @@ public class StudentController {
     @PostMapping("/save") // http://localhost:8080/student/save  + JSON + POST
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<ResponseMessage<StudentResponse>> saveStudent(
-            @RequestBody @Valid StudentRequest studentRequest) {
+            @RequestBody @Valid StudentRequest studentRequest){
 
         return ResponseEntity.ok(studentService.saveStudent(studentRequest));
     }
@@ -51,9 +51,12 @@ public class StudentController {
     //!!! Student larin status degerini degistiren metod
     @GetMapping("/changeStatus") // http://localhost:8080/student/changeStatus?id=3&status=true
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    public ResponseMessage changeStatusOfStudent(@RequestParam Long id,
-                                                 @RequestParam boolean status){
+    public ResponseMessage changeStatusOfStudent(@RequestParam Long id, @RequestParam boolean status){
 
         return studentService.changeStatusOfStudent(id, status);
     }
+
+    // TODO : addLessonProgramToStudentLessonsProgram() *************************
+
+
 }

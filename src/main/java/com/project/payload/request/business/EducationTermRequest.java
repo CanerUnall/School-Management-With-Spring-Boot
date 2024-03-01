@@ -23,13 +23,13 @@ public class EducationTermRequest {
 
     @NotNull(message = "Start Date must not be empty")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate startDate;
+    private LocalDate startDate; // 10 Subat
 
     @NotNull(message = "End Date must not be empty")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
+    private LocalDate endDate; // 10 Haziran
 
     @NotNull(message = "Last Registration Date must not be empty")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate lastRegistrationDate;
+    private LocalDate lastRegistrationDate; // 20 Subat
 }

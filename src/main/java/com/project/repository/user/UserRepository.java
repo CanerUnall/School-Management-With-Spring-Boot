@@ -2,6 +2,7 @@ package com.project.repository.user;
 
 import com.project.entity.concretes.user.User;
 import com.project.entity.enums.RoleType;
+import com.project.payload.response.user.StudentResponse;
 import com.project.payload.response.user.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,9 +27,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> getUserByNameContaining(String name);
 
-    //JPQL
     @Query(value = "SELECT COUNT(u) FROM User u WHERE u.userRole.roleType = ?1")
     long countAdmin(RoleType roleType);
+
     List<User> findByAdvisorTeacherId(Long id);
 
     @Query("SELECT u FROM User u WHERE u.isAdvisor =?1")
@@ -39,6 +40,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT MAX (u.studentNumber) FROM User u")
     int getMaxStudentNumber();
-
 
 }

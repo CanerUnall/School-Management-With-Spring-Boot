@@ -24,6 +24,4 @@ public class UserRoleService {
     public List<UserRole> getAllUserRole(){
         return userRoleRepository.findAll();
     }
-
-
 }

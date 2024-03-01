@@ -22,9 +22,9 @@ public class TeacherController {
 
     private final TeacherService teacherService;
 
-    @PostMapping("/save")
+    @PostMapping("/save") // http://localhost:8080/teacher/save + POST + JSON
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ResponseEntity<ResponseMessage<TeacherResponse>> saveTeacher(@RequestBody @Valid TeacherRequest teacherRequest) {
+    public ResponseEntity<ResponseMessage<TeacherResponse>> saveTeacher(@RequestBody @Valid TeacherRequest teacherRequest){
         return ResponseEntity.ok(teacherService.saveTeacher(teacherRequest));
     }
 
@@ -60,5 +60,6 @@ public class TeacherController {
     public List<UserResponse> getAllAdvisorTeacher(){
         return teacherService.getAllAdvisorTeacher();
     }
+
 
 }

@@ -66,9 +66,9 @@ public class StudentService {
     public ResponseEntity<String> updateStudent(StudentRequestWithoutPassword studentRequest,
                                                 HttpServletRequest request) {
 
-        String userName = (String) request.getAttribute("username");
-        User student = userRepository.findByUsernameEquals(userName);
-        //!!! unique kontrol
+       String userName = (String) request.getAttribute("username");
+       User student = userRepository.findByUsernameEquals(userName);
+       //!!! unique kontrol
         uniquePropertyValidator.checkUniqueProperties(student, studentRequest);
 
         student.setMotherName(studentRequest.getMotherName());
@@ -109,6 +109,9 @@ public class StudentService {
         user.setFatherName(studentRequest.getFatherName());
         user.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
         user.setAdvisorTeacherId(studentRequest.getAdvisorTeacherId());
+        //user.setUserRole(userRoleService.getUserRole(RoleType.STUDENT));
+        //user.setActive(true);
+        //user.setStudentNumber(user.getStudentNumber());
 
         return ResponseMessage.<StudentResponse>builder()
                 .message(SuccessMessages.STUDENT_UPDATE)
@@ -131,3 +134,16 @@ public class StudentService {
                 .build();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

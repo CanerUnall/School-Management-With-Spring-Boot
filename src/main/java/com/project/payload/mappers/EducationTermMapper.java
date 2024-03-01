@@ -11,6 +11,15 @@ import org.springframework.stereotype.Component;
 public class EducationTermMapper {
 
     //!!! DTO --> POJO
+    public EducationTerm mapEducationTermRequestToEducationTerm(EducationTermRequest educationTermRequest){
+
+        return EducationTerm.builder()
+                .term(educationTermRequest.getTerm())
+                .startDate(educationTermRequest.getStartDate())
+                .endDate(educationTermRequest.getEndDate())
+                .lastRegistrationDate(educationTermRequest.getLastRegistrationDate())
+                .build();
+    }
 
     //!!! POJO --> DTO
     public EducationTermResponse mapEducationTermToEducationTermResponse(EducationTerm educationTerm){
@@ -23,15 +32,7 @@ public class EducationTermMapper {
                 .lastRegistrationDate(educationTerm.getLastRegistrationDate())
                 .build();
     }
-    public EducationTerm mapEducationTermRequestToEducationTerm(EducationTermRequest educationTermRequest){
 
-        return EducationTerm.builder()
-                .term(educationTermRequest.getTerm())
-                .startDate(educationTermRequest.getStartDate())
-                .endDate(educationTermRequest.getEndDate())
-                .lastRegistrationDate(educationTermRequest.getLastRegistrationDate())
-                .build();
-    }
     //!!! Update kisminda kullanilacak
     public EducationTerm mapEducationTermRequestToUpdatedEducationTerm(Long id,EducationTermRequest educationTermRequest){
 
@@ -40,4 +41,6 @@ public class EducationTermMapper {
                 .id(id)
                 .build();
     }
+
+
 }

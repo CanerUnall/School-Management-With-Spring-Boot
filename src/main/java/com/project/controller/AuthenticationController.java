@@ -1,11 +1,11 @@
 package com.project.controller;
 
+import com.project.entity.concretes.user.User;
 import com.project.payload.messages.SuccessMessages;
 import com.project.payload.request.authentication.LoginRequest;
 import com.project.payload.request.business.UpdatePasswordRequest;
 import com.project.payload.response.abstracts.BaseUserResponse;
 import com.project.payload.response.authentication.AuthResponse;
-import com.project.payload.response.business.ResponseMessage;
 import com.project.payload.response.user.UserResponse;
 import com.project.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -23,32 +23,60 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    /*@PostMapping("/login") // http://localhost:8080/auth/login  + POST
-    public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
-        return authenticationService.authenticateUser(loginRequest);
-    }*/
-
     @PostMapping("/login") // http://localhost:8080/auth/login  + POST
-    public ResponseMessage<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
         return authenticationService.authenticateUser(loginRequest);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','Assistant_MANAGER','TEACHER','STUDENT')")
     @GetMapping("/user") // http://localhost:8080/auth/user + GET
-    public ResponseEntity<UserResponse> findByUsername(HttpServletRequest request) {
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER','STUDENT')")
+    public ResponseEntity<UserResponse> findByUsername(HttpServletRequest request){
         String username = (String) request.getAttribute("username");
         UserResponse userResponse = authenticationService.findByUsername(username);
         return ResponseEntity.ok(userResponse);
     }
 
-    //putmapping bütün verılerı update ıcın kullanılıyor
-    //patchmapping parçalayarak update eder. setlemedıgınız degıskenler null olmaz
-    @PatchMapping("/updatePassword")
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','Assistant_MANAGER','TEACHER','STUDENT')")
+    @PatchMapping("/updatePassword") // http://localhost:8080/auth/updatePassword + Patch + JSON
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER','STUDENT')")
     public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest,
-                                                 HttpServletRequest request) {
+                                                 HttpServletRequest request){
         authenticationService.updatePassword(updatePasswordRequest, request);
         String response = SuccessMessages.PASSWORD_CHANGED_RESPONSE_MESSAGE;
         return ResponseEntity.ok(response);
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 package com.project.service.user;
 
+import com.project.contactmessage.repository.ContactMessageRepository;
 import com.project.entity.concretes.user.User;
 import com.project.entity.enums.RoleType;
 import com.project.exception.ConflictException;
@@ -34,6 +35,7 @@ public class TeacherService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final MethodHelper methodHelper;
+    private final ContactMessageRepository contactMessageRepository;
 
     public ResponseMessage<TeacherResponse> saveTeacher(TeacherRequest teacherRequest) {
 
@@ -118,7 +120,6 @@ public class TeacherService {
                 .httpStatus(HttpStatus.OK)
                 .build();
     }
-
 
     public ResponseMessage<UserResponse> deleteAdvisorTeacherById(Long id) {
 

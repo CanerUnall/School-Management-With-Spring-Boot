@@ -59,10 +59,10 @@ public class EducationTermController {
     @PutMapping("/update/{id}")  // http://localhost:8080/educationTerms/update/1 + JSON
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER')")
     public ResponseMessage<EducationTermResponse> updateEducationTermById(@PathVariable Long id,
-                                                                          @RequestBody @Valid
-                                                                          EducationTermRequest educationTermRequest) {
+                                                     @RequestBody @Valid EducationTermRequest educationTermRequest) {
 
         return educationTermService.updateEducationTermById(id, educationTermRequest);
     }
+
 
 }

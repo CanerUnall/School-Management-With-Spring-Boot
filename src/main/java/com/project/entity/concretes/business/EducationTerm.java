@@ -48,5 +48,4 @@ public class EducationTerm {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<LessonProgram> lessonProgram;
 
-
 }

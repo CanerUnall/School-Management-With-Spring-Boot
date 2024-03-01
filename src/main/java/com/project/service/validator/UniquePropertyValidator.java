@@ -4,6 +4,8 @@ import com.project.entity.concretes.user.User;
 import com.project.exception.ConflictException;
 import com.project.payload.messages.ErrorMessages;
 import com.project.payload.request.abstracts.AbstractUserRequest;
+import com.project.payload.request.abstracts.BaseUserRequest;
+import com.project.payload.request.user.UserRequest;
 import com.project.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,12 +15,12 @@ import org.springframework.stereotype.Component;
 public class UniquePropertyValidator {
 
     private final UserRepository userRepository;
+
     public void checkUniqueProperties(User user, AbstractUserRequest abstractUserRequest){
         String updatedUsername="";
         String updatedSsn="";
         String updatedPhone="";
         String updatedEmail="";
-
         boolean isChanged= false;
 
         if( ! user.getUsername().equalsIgnoreCase(abstractUserRequest.getUsername())){

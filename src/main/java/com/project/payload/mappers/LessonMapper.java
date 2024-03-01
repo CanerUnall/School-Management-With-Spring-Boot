@@ -30,13 +30,11 @@ public class LessonMapper {
     }
 
     public Lesson mapLessonRequestToUpdatedLesson(Long lessonId, LessonRequest lessonRequest){
-        /*Lesson.builder()
+        return Lesson.builder()
                 .lessonId(lessonId)
                 .lessonName(lessonRequest.getLessonName())
                 .creditScore(lessonRequest.getCreditScore())
                 .isCompulsory(lessonRequest.getIsCompulsory())
-                .build();*/
-
-        return mapLessonRequestToLesson(lessonRequest).toBuilder().lessonId(lessonId).build();
+                .build();
     }
 }
