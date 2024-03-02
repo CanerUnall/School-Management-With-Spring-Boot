@@ -1,6 +1,7 @@
 package com.project.service.user;
 
 import com.project.contactmessage.repository.ContactMessageRepository;
+import com.project.entity.concretes.business.LessonProgram;
 import com.project.entity.concretes.user.User;
 import com.project.entity.enums.RoleType;
 import com.project.exception.ConflictException;
@@ -14,6 +15,7 @@ import com.project.payload.response.user.TeacherResponse;
 import com.project.payload.response.user.UserResponse;
 import com.project.repository.user.UserRepository;
 import com.project.repository.user.UserRoleRepository;
+import com.project.service.business.LessonProgramService;
 import com.project.service.helper.MethodHelper;
 import com.project.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,10 +39,11 @@ public class TeacherService {
     private final UserRepository userRepository;
     private final MethodHelper methodHelper;
     private final ContactMessageRepository contactMessageRepository;
+    private final LessonProgramService lessonProgramService;
 
     public ResponseMessage<TeacherResponse> saveTeacher(TeacherRequest teacherRequest) {
 
-        //!!! TODO : LessonProgram kontrolu
+        Set<LessonProgram> lessonProgramSet = lessonProgramService.getLessonProgramById(teacherRequest.getLessonsIdList());
 
         //!!! unique kontrolu
         uniquePropertyValidator.checkDuplicate(teacherRequest.getUsername(), teacherRequest.getSsn(),
@@ -48,7 +52,7 @@ public class TeacherService {
         User teacher = userMapper.mapTeacherRequestToUser(teacherRequest);
 
         teacher.setUserRole(userRoleService.getUserRole(RoleType.TEACHER));
-        //!!! TODO : LessonProgram setleme islemi :
+        teacher.setLessonsProgramList(lessonProgramSet);
         teacher.setPassword(passwordEncoder.encode(teacherRequest.getPassword()));
 
         if(teacherRequest.getIsAdvisorTeacher()){
@@ -71,14 +75,14 @@ public class TeacherService {
         //!!! parametrede gelen User gercekten Teacher mi kontrolu
         methodHelper.checkRole(user, RoleType.TEACHER);
 
-        //!!! TODO : LessonProgramlar getiriliyor
+        Set<LessonProgram> lessonPrograms = lessonProgramService.getLessonProgramById(teacherRequest.getLessonsIdList());
 
         //!!! unique kontrolu
         uniquePropertyValidator.checkUniqueProperties(user, teacherRequest);
         //!!! DTO --> POJO
         User updatedTeacher = userMapper.mapTeacherRequestToUpdatedUser(teacherRequest, userId);
         updatedTeacher.setPassword(passwordEncoder.encode(teacherRequest.getPassword()));
-        //!!! TODO :  LessonProgramlar setlenecek
+        updatedTeacher.setLessonsProgramList(lessonPrograms);
         updatedTeacher.setUserRole(userRoleService.getUserRole(RoleType.TEACHER));
 
         User savedTeacher = userRepository.save(updatedTeacher);
