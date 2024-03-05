@@ -17,13 +17,18 @@ import com.project.payload.response.business.ResponseMessage;
 import com.project.payload.response.business.StudentInfoResponse;
 import com.project.repository.business.StudentInfoRepository;
 import com.project.service.helper.MethodHelper;
+import com.project.service.helper.PageableHelper;
 import com.project.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,7 @@ public class StudentInfoService {
     private final LessonService lessonService;
     private final EducationTermService educationTermService;
     private final StudentInfoMapper studentInfoMapper;
+    private final PageableHelper pageableHelper;
 
     @Value("${midterm.exam.impact.percentage}")
     private Double midtermExamPercentage;
@@ -64,7 +70,7 @@ public class StudentInfoService {
         Note note = checkLetterGrade(average);
 
         // !!! DTO --> POJO
-        StudentInfo studentInfo = studentInfoMapper.mapStudentInfoRequestToStudentInfo(studentInfoRequest, note, average);
+        StudentInfo studentInfo = studentInfoMapper.mapStudentInfoRequestToStudentInfo(studentInfoRequest,note,average);
         studentInfo.setStudent(student);
         studentInfo.setEducationTerm(educationTerm);
         studentInfo.setTeacher(teacher);
@@ -79,34 +85,34 @@ public class StudentInfoService {
                 .build();
     }
 
-    private void checkSameLesson(Long studentId, String lessonName) {
+    private void checkSameLesson(Long studentId, String lessonName){
         boolean isLessonDuplicateExist =
                 studentInfoRepository.getAllByStudentId_Id(studentId)
                         .stream()
-                        .anyMatch(e -> e.getLesson().getLessonName().equalsIgnoreCase(lessonName));
+                        .anyMatch(e->e.getLesson().getLessonName().equalsIgnoreCase(lessonName));
 
-        if (isLessonDuplicateExist) {
+        if(isLessonDuplicateExist){
             throw new ConflictException(String.format(ErrorMessages.LESSON_ALREADY_EXIST_WITH_LESSON_NAME, lessonName));
         }
     }
 
-    private Double calculateExamAverage(Double midtermExam, Double finalExam) {
+    private Double calculateExamAverage(Double midtermExam, Double finalExam){
 
-        return (midtermExam * midtermExamPercentage) + (finalExam * finalExamPercentage);
+        return (midtermExam * midtermExamPercentage ) + ( finalExam * finalExamPercentage );
     }
 
-    private Note checkLetterGrade(Double average) {
-        if (average < 50.0) {
+    private Note checkLetterGrade(Double average){
+        if(average<50.0) {
             return Note.FF;
-        } else if (average < 60) {
+        } else if (average<60) {
             return Note.DD;
-        } else if (average < 65) {
+        } else if (average<65) {
             return Note.CC;
-        } else if (average < 70) {
-            return Note.CB;
-        } else if (average < 75) {
-            return Note.BB;
-        } else if (average < 80) {
+        } else if (average<70) {
+            return  Note.CB;
+        } else if (average<75) {
+            return  Note.BB;
+        } else if (average<80) {
             return Note.BA;
         } else {
             return Note.AA;
@@ -126,27 +132,80 @@ public class StudentInfoService {
 
     }
 
-    public StudentInfo isStudentInfoExistById(Long id) {
+    public StudentInfo isStudentInfoExistById(Long id){
         boolean isExist = studentInfoRepository.existsByIdEquals(id);
 
-        if (!isExist) {
-            throw new ResourceNotFoundException(String.format(ErrorMessages.STUDENT_INFO_NOT_FOUND));
+        if(!isExist){
+           throw new ResourceNotFoundException(String.format(ErrorMessages.STUDENT_INFO_NOT_FOUND));
         } else {
-            return studentInfoRepository.findById(id).get();
+            return  studentInfoRepository.findById(id).get();
         }
-
-        /*return  studentInfoRepository.findById(id).orElseThrow(()->
-                new ResourceNotFoundException("not found"));*/
     }
 
     public ResponseMessage<StudentInfoResponse> update(UpdateStudentInfoRequest studentInfoRequest, Long studentInfoId) {
 
         Lesson lesson = lessonService.isLessonExistById(studentInfoRequest.getLessonId());
         StudentInfo studentInfo = isStudentInfoExistById(studentInfoId);
-        EducationTerm educationTerm = educationTermService.findEducationTermById(studentInfoRequest.getEducationTermId());
+        EducationTerm educationTerm =educationTermService.findEducationTermById(studentInfoRequest.getEducationTermId());
         Double noteAverage = calculateExamAverage(studentInfoRequest.getMidtermExam(), studentInfoRequest.getFinalExam());
         Note note = checkLetterGrade(noteAverage);
         //!!! DTO --> POJO
-        return null;
+        StudentInfo studentInfoUpdate =
+                studentInfoMapper.mapStudentInfoUpdateToStudentInfo(studentInfoRequest,studentInfoId,lesson,
+                                                                     educationTerm,note,noteAverage);
+        studentInfoUpdate.setTeacher(studentInfo.getTeacher());
+        studentInfoUpdate.setStudent(studentInfo.getStudent());
+
+        StudentInfo updatedStudentInfo =  studentInfoRepository.save(studentInfoUpdate);
+
+        return ResponseMessage.<StudentInfoResponse>builder()
+                .message(SuccessMessages.STUDENT_INFO_UPDATE)
+                .httpStatus(HttpStatus.OK)
+                .object(studentInfoMapper.mapStudentInfoToStudentInfoResponse(updatedStudentInfo))
+                .build();
+    }
+
+    public Page<StudentInfoResponse> getAllStudentInfoByPage(int page, int size, String sort, String type) {
+        Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+        return studentInfoRepository.findAll(pageable)
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+    }
+
+    public List<StudentInfoResponse> getStudentInfoByStudentId(Long studentId) {
+        User student = methodHelper.isUserExist(studentId);
+        // gelen user Student rolune sahip mi ??
+        methodHelper.checkRole(student,RoleType.STUDENT);
+
+        // !!! Bu ogrenciye ait bir studentInfo var mi ??
+        if(!studentInfoRepository.existsByStudent_IdEquals(studentId)){ // JPQL
+            throw new ResourceNotFoundException(
+                    String.format(ErrorMessages.STUDENT_INFO_NOT_FOUND_BY_STUDENT_ID,studentId));
+        }
+
+        return studentInfoRepository.findByStudent_IdEquals(studentId) // jPQL
+                .stream()
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse)
+                .collect(Collectors.toList());
+    }
+
+    public StudentInfoResponse findStudentInfoById(Long studentInfoId) {
+        return studentInfoMapper.mapStudentInfoToStudentInfoResponse(isStudentInfoExistById(studentInfoId));
+    }
+
+    public Page<StudentInfoResponse> getAllForTeacher(HttpServletRequest httpServletRequest, int page, int size) {
+
+        Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+        String userName = (String) httpServletRequest.getAttribute("username");
+
+        return studentInfoRepository.findByTeacherId_UsernameEquals(userName,pageable)
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+    }
+
+    public Page<StudentInfoResponse> getAllForStudent(HttpServletRequest httpServletRequest, int page, int size) {
+        Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+        String userName = (String) httpServletRequest.getAttribute("username");
+
+        return studentInfoRepository.findByStudentId_UsernameEquals(userName,pageable)
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
     }
 }

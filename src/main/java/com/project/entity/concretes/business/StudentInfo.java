@@ -39,7 +39,7 @@ public class StudentInfo {
     @JsonIgnore
     private User teacher;
 
-    @ManyToOne  // 1 ogrencinin aldigi ders sayisi kadar studentInfosu vardir
+    @ManyToOne  // 1 ogrenci aldigi ders sayisi kadar studentInfosu vardir
     @JsonIgnore
     private User student;
 
