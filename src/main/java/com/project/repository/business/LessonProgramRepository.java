@@ -1,9 +1,11 @@
 package com.project.repository.business;
 
 import com.project.entity.concretes.business.LessonProgram;
+import com.project.payload.response.business.LessonProgramResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 

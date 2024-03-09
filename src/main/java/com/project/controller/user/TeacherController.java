@@ -1,5 +1,6 @@
 package com.project.controller.user;
 
+import com.project.payload.request.business.ChooseLessonTeacherRequest;
 import com.project.payload.request.user.TeacherRequest;
 import com.project.payload.response.business.ResponseMessage;
 import com.project.payload.response.user.StudentResponse;
@@ -61,5 +62,11 @@ public class TeacherController {
         return teacherService.getAllAdvisorTeacher();
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    @PostMapping("/addLessonProgram") // http://localhost:8080/teachers/addLessonProgram
+    public ResponseMessage<TeacherResponse> chooseLesson(@RequestBody @Valid
+                                                         ChooseLessonTeacherRequest chooseLessonTeacherRequest){
+        return teacherService.addLessonProgram(chooseLessonTeacherRequest);
+    }
 
 }

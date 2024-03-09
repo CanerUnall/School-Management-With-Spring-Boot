@@ -2,6 +2,7 @@ package com.project.payload.response.abstracts;
 
 import com.project.entity.enums.Gender;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;

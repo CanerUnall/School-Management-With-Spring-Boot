@@ -8,6 +8,7 @@ import com.project.entity.concretes.business.Meet;
 import com.project.entity.concretes.business.StudentInfo;
 import com.project.entity.enums.Gender;
 import lombok.*;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.persistence.*;
 import java.time.LocalDate;

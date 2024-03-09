@@ -32,35 +32,34 @@ public class StudentInfoController {
 
     @DeleteMapping("/delete/{studentInfoId}") // http://localhost:8080/studentInfo/delete/1
     @PreAuthorize("hasAnyAuthority('ADMIN','TEACHER')")
-    public ResponseMessage delete(@PathVariable Long studentInfoId) {
+    public ResponseMessage delete(@PathVariable Long studentInfoId){
         return studentInfoService.deleteStudentInfo(studentInfoId);
     }
 
     // Not: ODEV ---> getAllWithPage /getAllStudentInfoByPage yoneticiler tetikliyecek
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    @GetMapping("/getAllStudentInfoByPage")
-    // http://localhost:8080/studentInfo/getAllStudentInfoByPage?page=0&size=10&sort=id&type=desc
+    @GetMapping("/getAllStudentInfoByPage") // http://localhost:8080/studentInfo/getAllStudentInfoByPage?page=0&size=10&sort=id&type=desc
     public Page<StudentInfoResponse> getAllStudentInfoByPage(
             @RequestParam(value = "page") int page,
             @RequestParam(value = "size") int size,
             @RequestParam(value = "sort") String sort,
             @RequestParam(value = "type") String type
     ) {
-        return studentInfoService.getAllStudentInfoByPage(page, size, sort, type);
+        return  studentInfoService.getAllStudentInfoByPage(page,size,sort,type);
     }
 
     // Not: ODEV ---> getStudentInfoByStudentId() yoneticiler tetikliyecek  /getByStudentId/{studentId}
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    @GetMapping("/getByStudentId/{studentId}")  // http://localhost:8080/studentInfo/studentInfo/getByStudentId/3
-    public ResponseEntity<List<StudentInfoResponse>> getStudentInfoByStudentId(@PathVariable Long studentId) {
-        List<StudentInfoResponse> studentInfoResponse = studentInfoService.getStudentInfoByStudentId(studentId);
+    @GetMapping("/getByStudentId/{studentId}")  // http://localhost:8080/studentInfo/getByStudentId/3
+    public ResponseEntity<List<StudentInfoResponse>> getStudentInfoByStudentId(@PathVariable Long studentId){
+        List<StudentInfoResponse>studentInfoResponse = studentInfoService.getStudentInfoByStudentId(studentId);
         return ResponseEntity.ok(studentInfoResponse);
     }
 
     // Not :ODEV ---> getStudentInfoById() yoneticiler tetikliyecek , /get/{studentInfoId}
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    @GetMapping("/get/{studentInfoId}") // http://localhost:8080/studentInfo/studentInfo/get/3
-    public ResponseEntity<StudentInfoResponse> getStudentInfoById(@PathVariable Long studentInfoId) {
+    @GetMapping("/get/{studentInfoId}") // http://localhost:8080/studentInfo/get/3
+    public ResponseEntity<StudentInfoResponse>getStudentInfoById(@PathVariable Long studentInfoId){
         return ResponseEntity.ok(studentInfoService.findStudentInfoById(studentInfoId));
     }
 
@@ -83,7 +82,7 @@ public class StudentInfoController {
     }
 
     // !!! --> bir ogrenci kendi bilgilerini almak isterse
-    @GetMapping("/getAllForStudent") // http://localhost:8080/studentInfo/getAllForStudent
+    @GetMapping("/getAllForStudent") // http://localhost:8080/studentInfo/getAllForStudent?page=0&size=10
     @PreAuthorize("hasAnyAuthority('STUDENT')")
     public ResponseEntity<Page<StudentInfoResponse>> getAllForStudent(
             HttpServletRequest httpServletRequest,
